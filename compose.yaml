@@ -2,7 +2,7 @@ name: crm-system
 
 services:
   postgres:
-    image: postgres:13
+    image: postgres:17.6
     env_file:
       - .env
     environment:
