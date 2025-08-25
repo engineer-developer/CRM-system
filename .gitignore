@@ -213,5 +213,5 @@ __marimo__/
 BRIEF/
 
 # Project static
-crm-system/static
-
+crm_system/static
+example_templates
