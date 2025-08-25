@@ -1,7 +1,7 @@
 [project]
-name = "crm-system"
+name = "crm_system"
 version = "0.1.0"
-description = "crm-system"
+description = "crm system"
 authors = [
     {name = "Alex Suslov",email = "suslov.lexx@gmail.com"}
 ]
