@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 
 from decouple import config
+from django.urls.base import reverse_lazy
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -107,6 +109,11 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+# Auth settings
+LOGIN_URL = reverse_lazy("auth_app:login")
+LOGIN_REDIRECT_URL = reverse_lazy("crm_app:index_page")
+LOGOUT_REDIRECT_URL = LOGIN_URL
 
 
 # Internationalization
