@@ -1,5 +1,8 @@
-from django.shortcuts import render
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-def index_page(request):
-    return render(request, "crm_app/index.html")
+class IndexPageView(LoginRequiredMixin, TemplateView):
+    """Представление исходной страницы приложения"""
+
+    template_name = "crm_app/index.html"
