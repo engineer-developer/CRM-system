@@ -10,4 +10,16 @@ class CustomLoginView(LoginView):
     redirect_authenticated_user = True
 
 
-# Create your views here.
+class CustomLogoutView(LogoutView):
+    """Представление logout"""
+
+    http_method_names = ["get"]
+
+    def get(self, request, *args, **kwargs) -> HttpResponseRedirect:
+        """Logout выполняется через GET."""
+        logout(request)
+        redirect_to = self.get_success_url()
+        if redirect_to != request.get_full_path():
+            # Redirect to target page once the session has been cleared.
+            return HttpResponseRedirect(redirect_to)
+        return super().get(request, *args, **kwargs)
