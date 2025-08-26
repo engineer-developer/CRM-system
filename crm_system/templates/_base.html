@@ -22,6 +22,11 @@
             </h1>
         </div>
         <ul class="list-unstyled px-2">
+            {% if user.is_superuser %}
+            <li><a href="/admin/" class="bar-item text-decoration-none px-3 py-3 d-block">
+                <span><i class="fas fa-cog"></i></span><span class="ml-1"> Админ панель</span>
+            </a></li>
+            {% endif %}
             {% if perms.products.view_product %}
             <li><a href="/products/" class="bar-item text-decoration-none px-3 py-3 d-block">
                 <span><i class="fas fa-microchip"></i></span><span class="ml-1"> Услуги</span>
