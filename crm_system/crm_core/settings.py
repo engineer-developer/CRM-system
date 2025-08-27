@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "auth_app.apps.AuthAppConfig",
     "crm_app.apps.CrmAppConfig",
+    "users_app.apps.UsersAppConfig",
 ]
 
 MIDDLEWARE = [
