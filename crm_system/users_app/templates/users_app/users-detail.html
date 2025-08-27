@@ -8,7 +8,11 @@
         <div class="card border-dark shadow" style="background: #eee">
             <div class="card-body">
                 <h5 class="card-title fw-bold">{{ object.last_name }} {{ object.first_name }}</h5>
-                <div class="d-flex justify-content-end fw-bold">{{ object.email }}</div>
+
+                <p class="card-text">login: {{ object.username }}</p>
+                <p class="card-text">email: {{ object.email }}</p>
+                <p class="card-text">role: {{ object.groups.first }}</p>
+
                 <div class="d-flex justify-content-center fw-bold">
                     <a href="/users/{{ object.pk }}/edit" class="btn btn-primary">Редактировать</a>
                 </div>
