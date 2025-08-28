@@ -4,6 +4,15 @@ from django import forms
 
 
 class UserCreateForm(forms.ModelForm):
+    groups = forms.ModelChoiceField(
+        queryset=Group.objects.all(),
+        required=True,
+        initial="1",
+        widget=forms.RadioSelect(),
+        label="Роль пользователя в системе",
+        help_text="",
+    )
+
     class Meta:
         model = User
         fields = ("username", "password", "last_name", "first_name", "email", "groups")
@@ -24,14 +33,9 @@ class UserCreateForm(forms.ModelForm):
             "email": forms.EmailInput(
                 attrs={"class": "form-control", "placeholder": "example@email.com"}
             ),
-            "groups": forms.Select,
-        }
-        help_texts = {
-            "groups": "",
         }
         labels = {
             "username": "Login пользователя",
-            "groups": "Роль пользователя в системе",
         }
 
 
