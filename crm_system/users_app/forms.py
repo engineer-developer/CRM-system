@@ -4,14 +4,7 @@ from django import forms
 
 
 class UserCreateForm(forms.ModelForm):
-    groups = forms.ModelChoiceField(
-        queryset=Group.objects.all(),
-        required=True,
-        initial="1",
-        widget=forms.RadioSelect(),
-        label="Роль пользователя в системе",
-        help_text="",
-    )
+    """Форма для создания пользователя"""
 
     class Meta:
         model = User
@@ -38,16 +31,20 @@ class UserCreateForm(forms.ModelForm):
             "username": "Login пользователя",
         }
 
+    some = forms.RadioSelect()
 
-class UserUpdateForm(ModelForm):
     groups = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         required=True,
-        initial="администратор",
-        widget=forms.Select(attrs={"class": "form-select"}),
-        label="Изменить роль пользователя",
+        initial=1,
+        widget=forms.RadioSelect(),
+        label="Роль пользователя в системе",
         help_text="",
     )
+
+
+class UserUpdateForm(ModelForm):
+    """Форма для обновления пользователя"""
 
     class Meta:
         model = User
@@ -58,19 +55,21 @@ class UserUpdateForm(ModelForm):
             "email": forms.EmailInput(attrs={"class": "form-control"}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        group = self.instance.groups.all()[0]
-        print(f"group: {group.name}")
-        self.fields["groups"].initial = group.pk
+    groups = forms.ModelChoiceField(
+        queryset=Group.objects.all(),
+        initial=1,
+        required=True,
+        widget=forms.RadioSelect(),
+        label="Изменить роль пользователя",
+        help_text="",
+    )
 
     def save(self, commit=True):
+        """Сохраняем пользователя с обновленным значением groups"""
         user = super().save(commit=False)
         if commit:
             user.save()
-            # Удаляем все группы и добавляем выбранную
             user.groups.clear()
             groups = self.cleaned_data["groups"]
-            print(f"cleaned_data: {groups}")
-            user.groups.add(self.cleaned_data["groups"])
+            user.groups.add(groups)
         return user
