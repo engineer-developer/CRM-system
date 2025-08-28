@@ -8,7 +8,6 @@ from django.views.generic import (
     UpdateView,
     DeleteView,
 )
-from django.http.response import HttpResponseRedirect
 
 from users_app.forms import UserCreateForm, UserUpdateForm
 
@@ -49,11 +48,3 @@ class UserUpdateView(UpdateView):
             "users_app:user_details",
             kwargs={"pk": self.object.pk},
         )
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if len(form.fields["groups"]) == 1:
-
-            return HttpResponseRedirect(self.get_success_url())
-
-        return response
