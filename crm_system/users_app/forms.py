@@ -1,10 +1,7 @@
-from tokenize import group
-
 from django.contrib.auth.models import User, Group
 from django.forms import ModelForm
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms.models import ModelChoiceField
 
 
 class UserCreateForm(forms.ModelForm):
