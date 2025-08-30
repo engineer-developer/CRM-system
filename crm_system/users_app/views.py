@@ -17,8 +17,18 @@ class UsersListView(ListView):
 
     model = User
     template_name = "users_app/users-list.html"
-    queryset = User.objects.filter(is_superuser=False).filter(is_active=True)
     context_object_name = "users"
+    ordering = ["last_name", "username"]
+
+    def get_queryset(self) -> QuerySet[User]:
+        """Получаем queryset пользователей"""
+        qs = super().get_queryset()
+        qs = (
+            qs.filter(is_active=True)  # оставляем только активных пользователей
+            .exclude(is_superuser=True)  # исключаем суперпользователей
+            .exclude(id=self.request.user.pk)  # исключаем текущего пользователя
+        )
+        return qs
 
 
 class UserDetailView(DetailView):
