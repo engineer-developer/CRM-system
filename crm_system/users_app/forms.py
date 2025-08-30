@@ -1,6 +1,10 @@
+from tokenize import group
+
 from django.contrib.auth.models import User, Group
 from django.forms import ModelForm
 from django import forms
+from django.core.exceptions import ValidationError
+from django.forms.models import ModelChoiceField
 
 
 class UserCreateForm(forms.ModelForm):
@@ -31,8 +35,6 @@ class UserCreateForm(forms.ModelForm):
             "username": "Login пользователя",
         }
 
-    some = forms.RadioSelect()
-
     groups = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         required=True,
@@ -41,6 +43,16 @@ class UserCreateForm(forms.ModelForm):
         label="Роль пользователя в системе",
         help_text="",
     )
+
+    def save(self, commit=True):
+        """Сохраняем пользователя с обновленным значением groups"""
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+            user.groups.clear()
+            groups = self.cleaned_data["groups"]
+            user.groups.add(groups)
+        return user
 
 
 class UserUpdateForm(ModelForm):
@@ -73,3 +85,31 @@ class UserUpdateForm(ModelForm):
             groups = self.cleaned_data["groups"]
             user.groups.add(groups)
         return user
+
+
+class UserPasswordForm(forms.Form):
+    """Форма для изменения паролей"""
+
+    password1 = forms.CharField(
+        label="Введите пароль",
+        widget=forms.PasswordInput(),
+    )
+    password2 = forms.CharField(
+        label="Подтвердите пароль",
+        widget=forms.PasswordInput(),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["password1"].widget.attrs.update({"class": "form-control mb-3"})
+        self.fields["password2"].widget.attrs.update({"class": "form-control mb-3"})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+
+        if password1 and password2 and password1 != password2:
+            raise ValidationError("Пароли не совпадают")
+
+        return cleaned_data
