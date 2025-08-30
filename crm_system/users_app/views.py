@@ -65,6 +65,7 @@ class UserUpdateView(UpdateView):
     form_class = UserUpdateForm
 
     def get_success_url(self):
+        """Получаем ссылку для перехода после успешного редактирования пользователя"""
         return reverse(
             "users_app:user_details",
             kwargs={"pk": self.object.pk},
