@@ -1,6 +1,7 @@
 from django.http.response import HttpResponseRedirect
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView, LogoutView
+from auth_app.forms import CustomLoginForm
 
 
 class CustomLoginView(LoginView):
@@ -8,6 +9,7 @@ class CustomLoginView(LoginView):
 
     template_name = "auth_app/login.html"
     redirect_authenticated_user = True
+    authentication_form = CustomLoginForm
 
 
 class CustomLogoutView(LogoutView):
