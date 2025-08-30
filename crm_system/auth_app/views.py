@@ -1,6 +1,8 @@
-from django.http.response import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from auth_app.forms import CustomLoginForm
 
 
@@ -12,12 +14,12 @@ class CustomLoginView(LoginView):
     authentication_form = CustomLoginForm
 
 
-class CustomLogoutView(LogoutView):
+class CustomLogoutView(LoginRequiredMixin, LogoutView):
     """Представление logout"""
 
     http_method_names = ["get"]
 
-    def get(self, request, *args, **kwargs) -> HttpResponseRedirect:
+    def get(self, request, *args, **kwargs) -> HttpResponseRedirect | HttpResponse:
         """Logout выполняется через GET."""
         logout(request)
         redirect_to = self.get_success_url()
