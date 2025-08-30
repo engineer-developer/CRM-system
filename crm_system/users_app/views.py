@@ -20,7 +20,7 @@ from users_app.forms import UserCreateForm, UserUpdateForm, UserPasswordForm
 class UsersListView(PermissionRequiredMixin, ListView):
     """Представление списка пользователей"""
 
-    permission_required = "users_app.view_user"
+    permission_required = "auth.view_user"
     model = User
     template_name = "users_app/users-list.html"
     context_object_name = "users"
@@ -40,7 +40,7 @@ class UsersListView(PermissionRequiredMixin, ListView):
 class UserDetailView(PermissionRequiredMixin, DetailView):
     """Представление информации о пользователе"""
 
-    permission_required = "users_app.view_user"
+    permission_required = "auth.view_user"
     model = User
     template_name = "users_app/users-detail.html"
 
@@ -48,7 +48,7 @@ class UserDetailView(PermissionRequiredMixin, DetailView):
 class UserCreateView(PermissionRequiredMixin, CreateView):
     """Представление для создания пользователя"""
 
-    permission_required = "users_app.add_user"
+    permission_required = "auth.add_user"
     model = User
     template_name = "users_app/users-create.html"
     form_class = UserCreateForm
@@ -64,7 +64,7 @@ class UserCreateView(PermissionRequiredMixin, CreateView):
 class UserUpdateView(PermissionRequiredMixin, UpdateView):
     """Представление для редактирования пользователя"""
 
-    permission_required = "users_app.change_user"
+    permission_required = "auth.change_user"
     model = User
     template_name = "users_app/users-edit.html"
     form_class = UserUpdateForm
@@ -80,7 +80,7 @@ class UserUpdateView(PermissionRequiredMixin, UpdateView):
 class UserDeleteView(PermissionRequiredMixin, DeleteView):
     """Представление для удаления пользователей"""
 
-    permission_required = "users_app.delete_user"
+    permission_required = "auth.delete_user"
     model = User
     template_name = "users_app/users-delete.html"
     success_url = reverse_lazy("users_app:users_list")
@@ -97,8 +97,11 @@ class UserPasswordUpdateView(UserPassesTestMixin, View):
         или входит ли он в группу администраторов
         """
         user = self.request.user
-        group_administrator = Group.objects.get(name="администратор")
-        return user.is_superuser or group_administrator in user.groups
+
+        is_user_in_group = user.groups.filter(name="администратор").exists()
+        if user.is_superuser or is_user_in_group:
+            return True
+        return False
 
     def get(self, request, *args, pk=None, **kwargs):
         """Рендеринг формы изменения пароля пользователя"""
