@@ -47,3 +47,11 @@ class Lead(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def delete(self, using=None, keep_parents=False):
+        """Soft delete"""
+        self.is_active = False
+        self.save()
+
+    def __str__(self):
+        return f"Лид '{self.last_name} {self.first_name}'"
