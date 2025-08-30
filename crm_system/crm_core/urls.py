@@ -24,8 +24,9 @@ from crm_core.settings import DEBUG
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("auth_app.urls")),
+    path("users/", include("users_app.urls")),
+    path("products/", include("products_app.urls")),
     path("", include("crm_app.urls")),
-    path("", include("users_app.urls")),
 ]
 
 if DEBUG:
