@@ -1,4 +1,5 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User, Group
 from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -85,10 +86,19 @@ class UserDeleteView(PermissionRequiredMixin, DeleteView):
     success_url = reverse_lazy("users_app:users_list")
 
 
-class UserPasswordUpdateView(View):
+class UserPasswordUpdateView(UserPassesTestMixin, View):
     """Представление для изменения пароля пользователя"""
 
     template_name = "users_app/users-password-update.html"
+
+    def test_func(self):
+        """
+        Функция проверяет, является ли пользователь суперпользователем
+        или входит ли он в группу администраторов
+        """
+        user = self.request.user
+        group_administrator = Group.objects.get(name="администратор")
+        return user.is_superuser or group_administrator in user.groups
 
     def get(self, request, *args, pk=None, **kwargs):
         """Рендеринг формы изменения пароля пользователя"""
