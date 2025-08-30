@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User
-from django.shortcuts import render
 from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -63,6 +62,15 @@ class UserUpdateView(UpdateView):
             "users_app:user_details",
             kwargs={"pk": self.object.pk},
         )
+
+
+class UserDeleteView(DeleteView):
+    """Представление для удаления пользователей"""
+
+    model = User
+    template_name = "users_app/users-delete.html"
+    success_url = reverse_lazy("users_app:users_list")
+
 
 class UserPasswordUpdateView(View):
     """Представление для изменения пароля пользователя"""
