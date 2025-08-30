@@ -16,9 +16,10 @@ from django.views.generic import (
 from users_app.forms import UserCreateForm, UserUpdateForm, UserPasswordForm
 
 
-class UsersListView(ListView):
+class UsersListView(PermissionRequiredMixin, ListView):
     """Представление списка пользователей"""
 
+    permission_required = "users_app.view_user"
     model = User
     template_name = "users_app/users-list.html"
     context_object_name = "users"
@@ -35,16 +36,18 @@ class UsersListView(ListView):
         return qs
 
 
-class UserDetailView(DetailView):
+class UserDetailView(PermissionRequiredMixin, DetailView):
     """Представление информации о пользователе"""
 
+    permission_required = "users_app.view_user"
     model = User
     template_name = "users_app/users-detail.html"
 
 
-class UserCreateView(CreateView):
+class UserCreateView(PermissionRequiredMixin, CreateView):
     """Представление для создания пользователя"""
 
+    permission_required = "users_app.add_user"
     model = User
     template_name = "users_app/users-create.html"
     form_class = UserCreateForm
@@ -57,9 +60,10 @@ class UserCreateView(CreateView):
         )
 
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(PermissionRequiredMixin, UpdateView):
     """Представление для редактирования пользователя"""
 
+    permission_required = "users_app.change_user"
     model = User
     template_name = "users_app/users-edit.html"
     form_class = UserUpdateForm
@@ -72,9 +76,10 @@ class UserUpdateView(UpdateView):
         )
 
 
-class UserDeleteView(DeleteView):
+class UserDeleteView(PermissionRequiredMixin, DeleteView):
     """Представление для удаления пользователей"""
 
+    permission_required = "users_app.delete_user"
     model = User
     template_name = "users_app/users-delete.html"
     success_url = reverse_lazy("users_app:users_list")
