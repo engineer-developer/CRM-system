@@ -49,6 +49,13 @@ class UserCreateView(CreateView):
     template_name = "users_app/users-create.html"
     form_class = UserCreateForm
 
+    def get_success_url(self):
+        """Получаем ссылку для перехода после успешного создания нового пользователя"""
+        return reverse(
+            "users_app:user_details",
+            kwargs={"pk": self.object.pk},
+        )
+
 
 class UserUpdateView(UpdateView):
     """Представление для редактирования пользователя"""
