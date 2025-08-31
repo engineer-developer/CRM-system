@@ -41,10 +41,7 @@ class Lead(models.Model):
         blank=True,
         verbose_name="Email",
     )
-    is_active = models.BooleanField(
-        default=True,
-        null=False,
-    )
+    is_active = models.BooleanField(default=True, null=False, verbose_name="Активен")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -53,5 +50,8 @@ class Lead(models.Model):
         self.is_active = False
         self.save()
 
+    def fullname(self):
+        return f"{self.last_name} {self.first_name}"
+
     def __str__(self):
-        return f"Лид '{self.last_name} {self.first_name}'"
+        return f"Лид '{self.fullname()}'"
