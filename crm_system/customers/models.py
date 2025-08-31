@@ -29,5 +29,8 @@ class Customer(models.Model):
         verbose_name="Дата изменения",
     )
 
+    def fullname(self):
+        return f"{self.lead.last_name} {self.lead.first_name}"
+
     def __str__(self):
-        return f"Клиент '{self.lead.last_name} {self.lead.first_name}'"
+        return f"Клиент '{self.fullname()}'"
