@@ -72,7 +72,7 @@ class CustomersUpdateView(PermissionRequiredMixin, generic.UpdateView):
     permission_required = ["customers.change_customer"]
     model = Customer
     template_name = "customers/customers-edit.html"
-    form_class = CustomerForm
+    form_class = CustomerUpdateForm
 
     def get_success_url(self):
         return reverse(

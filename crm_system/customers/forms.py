@@ -53,3 +53,15 @@ class CustomerForm(forms.Form):
             raise ValidationError("Дата начала не может быть позже даты окончания.")
 
         return cleaned_data
+
+
+class CustomerUpdateForm(forms.ModelForm):
+
+    class Meta:
+        model = Customer
+        fields = ["lead"]
+        widgets = {
+            "lead": forms.RadioSelect(),
+        }
+        labels = {"lead": "Для изменения выбери лида"}
+        required_fields = ["lead"]
