@@ -1,9 +1,14 @@
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
+from contracts.models import Contract
 from customers.forms import CustomerForm
 from customers.models import Customer
+from leads.models import Lead
+from products.models import Product
 
 
 class CustomersListView(PermissionRequiredMixin, generic.ListView):
@@ -24,6 +29,33 @@ class CustomersCreateView(PermissionRequiredMixin, generic.CreateView):
     template_name = "customers/customers-create.html"
     form_class = CustomerForm
     success_url = reverse_lazy("customers:customers_list")
+
+    def get(self, request, *args, **kwargs):
+        """Передаем форму для заполнения исходными данными"""
+        form = CustomerForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request, *args, **kwargs):
+        """Создаем клиента на основе данных формы"""
+        form = CustomerForm(request.POST)
+        if not form.is_valid():
+            return render(request, self.template_name, {"form": form}, status=400)
+
+        cleaned_data = form.cleaned_data
+        lead: Lead = cleaned_data.get("lead")
+        product: Product = form.cleaned_data.get("product")
+        customer, _ = Customer.objects.get_or_create(lead=lead)
+        contract: Contract = Contract(
+            name=f"Контракт об оказании услуги '{product.name}'",
+            cost=product.cost,
+            product=product,
+            lead=lead,
+            customer=customer,
+            start_date=cleaned_data.get("start_date"),
+            end_date=cleaned_data.get("end_date"),
+        )
+        contract.save()
+        return HttpResponseRedirect(reverse("customers:customers_list"))
 
 
 class CustomersDetailView(PermissionRequiredMixin, generic.DetailView):
