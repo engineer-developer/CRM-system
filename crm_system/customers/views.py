@@ -5,7 +5,7 @@ from django.views import generic
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from contracts.models import Contract
-from customers.forms import CustomerForm
+from customers.forms import CustomerCreateForm, CustomerUpdateForm
 from customers.models import Customer
 from leads.models import Lead
 from products.models import Product
@@ -27,17 +27,17 @@ class CustomersCreateView(PermissionRequiredMixin, generic.CreateView):
     permission_required = ["customers.add_customer"]
     model = Customer
     template_name = "customers/customers-create.html"
-    form_class = CustomerForm
+    form_class = CustomerCreateForm
     success_url = reverse_lazy("customers:customers_list")
 
     def get(self, request, *args, **kwargs):
         """Передаем форму для заполнения исходными данными"""
-        form = CustomerForm()
+        form = CustomerCreateForm()
         return render(request, self.template_name, {"form": form})
 
     def post(self, request, *args, **kwargs):
         """Создаем клиента на основе данных формы"""
-        form = CustomerForm(request.POST)
+        form = CustomerCreateForm(request.POST)
         if not form.is_valid():
             return render(request, self.template_name, {"form": form}, status=400)
 

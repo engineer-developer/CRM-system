@@ -1,12 +1,13 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from customers.models import Customer
 from leads.models import Lead
 from products.models import Product
 
 
-class CustomerForm(forms.Form):
-    """Форма для создания модели клиента"""
+class CustomerCreateForm(forms.Form):
+    """Форма для создания клиента"""
 
     lead = forms.ModelChoiceField(
         queryset=Lead.objects.all(),
