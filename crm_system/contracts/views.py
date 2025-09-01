@@ -100,3 +100,20 @@ class ContractsDeleteView(PermissionRequiredMixin, generic.DeleteView):
     model = Contract
     template_name = "contracts/contracts-delete.html"
     success_url = reverse_lazy("contracts:contracts_list")
+
+    def form_valid(self, form):
+        """
+        Удаляя контракты, проверяем есть ли у клиента другие контракты.
+        Если у клиента контрактов нет,
+        убираем его из активных клиентов (удаляем клиента без контрактов)
+        """
+
+        contract: Contract = self.object
+        customer: Customer = contract.customer
+
+        contract.delete()
+
+        if not customer.contracts.exists():
+            customer.delete()
+
+        return HttpResponseRedirect(self.get_success_url())
