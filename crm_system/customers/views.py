@@ -58,6 +58,17 @@ class CustomersCreateView(PermissionRequiredMixin, generic.CreateView):
         return HttpResponseRedirect(reverse("customers:customers_list"))
 
 
+class CustomerCreateFromLeadView(CustomersCreateView):
+    """Представление для создания клиента на основе лида"""
+
+    def get(self, request, *args, pk=None, **kwargs):
+        lead_qs = Lead.objects.filter(id=pk)
+        form = CustomerCreateForm()
+        form.fields["lead"].queryset = lead_qs
+        form.fields["lead"].initial = lead_qs[0]
+        return render(request, self.template_name, {"form": form})
+
+
 class CustomersDetailView(PermissionRequiredMixin, generic.DetailView):
     """Представление для просмотра подробной информации о клиенте"""
 

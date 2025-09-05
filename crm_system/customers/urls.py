@@ -7,11 +7,17 @@ from customers.views import (
     CustomersUpdateView,
     CustomersDeleteView,
     CustomersListView,
+    CustomerCreateFromLeadView,
 )
 
 app_name = "customers"
 
 urlpatterns = [
+    path(
+        "new/lead/<int:pk>/",
+        CustomerCreateFromLeadView.as_view(),
+        name="customer_create_from_lead",
+    ),
     path("new/", CustomersCreateView.as_view(), name="customer_create"),
     path("<int:pk>/", CustomersDetailView.as_view(), name="customer_details"),
     path("<int:pk>/edit/", CustomersUpdateView.as_view(), name="customer_edit"),
