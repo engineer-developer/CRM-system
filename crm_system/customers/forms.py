@@ -13,7 +13,7 @@ class CustomerCreateForm(forms.Form):
         queryset=Lead.objects.all(),
         required=True,
         initial=0,
-        widget=forms.Select(),
+        widget=forms.RadioSelect(),
         label="Выберите лида для перевода в активного клиента",
         help_text="",
     )
@@ -21,7 +21,7 @@ class CustomerCreateForm(forms.Form):
         queryset=Product.objects.all(),
         required=True,
         initial=0,
-        widget=forms.Select(),
+        widget=forms.RadioSelect(),
         label="Выберите услугу для клиента",
         help_text="",
     )
