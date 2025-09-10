@@ -6,11 +6,12 @@
     <div class="col"></div>
     <div class="col">
       <p>Вы уверены, что хотите удалить "{{ object.last_name }} {{ object.first_name }}"?</p>
-      <form method="POST" action="/users/{{ object.pk }}/delete/">
+      <form method="POST" action="{% url "users:user_delete" user.pk %}">
         {% csrf_token %}
         {{ form.as_p }}
         <div class="text-center">
           <button type="submit" class="btn btn-danger">Удалить</button>
+          <a href="{% url "users:users_list" %}" class="btn btn-secondary">Назад</a>
         </div>
       </form>
     </div>

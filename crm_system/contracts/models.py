@@ -1,9 +1,11 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models.constraints import CheckConstraint
 
-from customers.models import Customer
-from leads.models import Lead
-from products.models import Product
+
+def upload_contract_file(instance, filename: str):
+    """Указываем путь загрузки файлов"""
+    return f"contracts/pdf_files/{filename}"
 
 
 class Contract(models.Model):
@@ -40,38 +42,48 @@ class Contract(models.Model):
         default=0,
         verbose_name="Стоимость контракта",
     )
+    file = models.FileField(
+        validators=[FileExtensionValidator(allowed_extensions=["pdf"])],
+        upload_to=upload_contract_file,
+        null=True,
+        verbose_name="Файл контракта",
+    )
     start_date = models.DateField(verbose_name="Дата начала действия контракта")
     end_date = models.DateField(verbose_name="Дата окончания действия контракта")
 
     product = models.ForeignKey(
-        to=Product,
+        to="products.Product",
         on_delete=models.SET_NULL,
         null=True,
         related_name="contracts",
         verbose_name="Услуга",
     )
-    lead = models.ForeignKey(
-        to=Lead,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="contracts",
-        verbose_name="Лид",
-    )
     customer = models.ForeignKey(
-        to=Customer,
+        to="customers.Customer",
         on_delete=models.SET_NULL,
         null=True,
         related_name="contracts",
         verbose_name="Клиент",
     )
+
     status = models.CharField(
         choices=ContractStatus.choices,
         default=ContractStatus.NEW,
         verbose_name="Статус",
     )
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата изменения")
+
+    def delete(self, using=None, keep_parents=False):
+        """Soft delete"""
+        self.is_active = False
+        self.save()
+
+        if not self.customer.contracts.filter(is_active=True).exists():
+            self.customer.is_active = False
+            self.customer.save()
 
     def __str__(self):
         return f"Контракт №{self.id}"

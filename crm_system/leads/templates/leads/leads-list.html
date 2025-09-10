@@ -15,10 +15,12 @@
                 <a href="{% url "leads:lead_details" lead.pk %}"
                    class="text-decoration-none link-dark">{{ lead.last_name }} {{ lead.first_name }}</a>
               </div>
-              <div class="p-2">
-                <a href="{% url "customers:customer_create_from_lead" lead.pk %}" class="btn btn-primary">Перевести в активного
-                  клиента</a>
-              </div>
+              {% if perms.customers.add_customer %}
+                <div class="p-2">
+                  <a href="{% url "customers:customer_create_from_lead" lead.pk %}" class="btn btn-primary"
+                  >Перевести в активного клиента</a>
+                </div>
+              {% endif %}
               <div class="p-2">
                 <a href="{% url "leads:lead_delete" lead.pk %}" class="btn btn-danger">Удалить</a>
               </div>

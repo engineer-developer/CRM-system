@@ -9,22 +9,14 @@
         <div class="card-body">
           <h5 class="card-title fw-bold">{{ object.last_name }} {{ object.first_name }}</h5>
 
-          <p class="card-text">Login пользователя:
-            <strong>{{ object.username }}</strong>
-          </p>
-          <p class="card-text">Email:
-            <strong>{{ object.email }}</strong>
-          </p>
-          <p class="card-text">Роль пользователя:
-            <strong>{{ object.groups.first }}</strong>
-          </p>
+          <p class="card-text">Login пользователя:<strong>{{ object.username }}</strong></p>
+          <p class="card-text">Email:<strong>{{ object.email }}</strong></p>
+          <p class="card-text">Роль пользователя:<strong>{{ object.groups.first }}</strong></p>
 
-          <div class="d-flex justify-content-center fw-bold mb-2">
-            <a href="{% url "users_app:user_edit" object.pk %}" class="btn btn-primary">Редактировать</a>
-          </div>
-
-          <div class="d-flex justify-content-center fw-bold">
-            <a href="{% url "users_app:users_list" %}" class="btn btn-secondary">Список пользователей</a>
+          <div class="d-flex justify-content-between">
+            <a href="{% url "users:user_edit" object.pk %}" class="btn btn-primary">Изменить</a>
+            <a href="{% url "users:user_delete" object.pk %}" class="btn btn-danger">Удалить</a>
+            <a href="{% url "users:users_list" %}" class="btn btn-secondary">Назад</a>
           </div>
 
         </div>

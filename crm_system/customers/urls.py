@@ -14,7 +14,7 @@ app_name = "customers"
 
 urlpatterns = [
     path(
-        "new/lead/<int:pk>/",
+        "new_from_lead/<int:pk>/",
         CustomerCreateFromLeadView.as_view(),
         name="customer_create_from_lead",
     ),

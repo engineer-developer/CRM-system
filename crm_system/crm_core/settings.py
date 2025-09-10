@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "leads.apps.LeadsConfig",
     "customers.apps.CustomersConfig",
     "contracts.apps.ContractsConfig",
+    "advertisements.apps.AdvertisementsConfig",
 ]
 
 MIDDLEWARE = [
@@ -140,6 +141,11 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT.mkdir(exist_ok=True)  # Создаем папку, если ее нет
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "uploads"
+MEDIA_ROOT.mkdir(exist_ok=True)  # Создаем папку, если ее нет
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

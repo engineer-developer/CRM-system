@@ -33,7 +33,7 @@ class UserCreateForm(forms.ModelForm):
         }
 
     groups = forms.ModelChoiceField(
-        queryset=Group.objects.all(),
+        queryset=Group.objects,
         required=True,
         initial=1,
         widget=forms.RadioSelect(),
@@ -65,8 +65,7 @@ class UserUpdateForm(ModelForm):
         }
 
     groups = forms.ModelChoiceField(
-        queryset=Group.objects.all(),
-        initial=1,
+        queryset=Group.objects,
         required=True,
         widget=forms.RadioSelect(),
         label="Изменить роль пользователя",

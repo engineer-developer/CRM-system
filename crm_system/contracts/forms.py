@@ -1,30 +1,41 @@
 from django import forms
+from django.core.validators import FileExtensionValidator
 
 from contracts.models import Contract
+from leads.models import Lead
 
 
 class ContractForm(forms.ModelForm):
     """Форма для модели контракта"""
 
+    lead = forms.ModelChoiceField(
+        queryset=Lead.objects,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Выберите лида",
+    )
+
     class Meta:
         model = Contract
         fields = (
             "product",
-            "lead",
             "start_date",
             "end_date",
+            "file",
         )
         widgets = {
             "product": forms.RadioSelect(),
-            "lead": forms.Select(attrs={"class": "form-select"}),
             "start_date": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}
             ),
             "end_date": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"},
             ),
+            "file": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }
-        required_fields = ["product", "lead", "start_date", "end_date"]
         error_messages = {
             "product": {"required": "Необходимо выбрать хотя бы одну услугу"}
         }
+
+    @property
+    def field_order(self):
+        return ["lead", "product", "start_date", "end_date", "file"]

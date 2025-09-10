@@ -1,12 +1,17 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from contracts.models import Contract
-from customers.forms import CustomerCreateForm, CustomerUpdateForm
+from customers.forms import (
+    CustomerCreateForm,
+    CustomerUpdateForm,
+    CustomerCreateFromLeadForm,
+)
 from customers.models import Customer
+from contracts.utils import create_contract
 from leads.models import Lead
 from products.models import Product
 
@@ -15,20 +20,54 @@ class CustomersListView(PermissionRequiredMixin, generic.ListView):
     """Представление списка клиентов"""
 
     permission_required = ["customers.view_customer"]
-    model = Customer
+    queryset = Customer
     template_name = "customers/customers-list.html"
     context_object_name = "customers"
-    ordering = ["lead__last_name"]
+
+    def get_queryset(self):
+        return (
+            Customer.objects.filter(is_active=True)
+            .select_related("lead")
+            .prefetch_related("contracts__product")
+        )
 
 
-class CustomersCreateView(PermissionRequiredMixin, generic.CreateView):
-    """Представление для создания клиента"""
+class CustomerCreateFromLeadView(PermissionRequiredMixin, generic.FormView):
+    """Представление для создания клиента на основе лида"""
 
     permission_required = ["customers.add_customer"]
-    model = Customer
+    template_name = "customers/customers-create_from_lead.html"
+
+    def get(self, request, *args, pk=None, **kwargs):
+        form = CustomerCreateFromLeadForm()
+        context = {"form": form, "lead_pk": pk}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, pk=None, **kwargs):
+        form = CustomerCreateFromLeadForm(request.POST)
+        if not form.is_valid():
+            context = {"form": form, "lead_pk": pk}
+            return render(request, self.template_name, context, status=400)
+
+        cleaned_data = form.cleaned_data
+        lead: Lead = Lead.objects.get(pk=pk)
+        customer, _ = Customer.objects.get_or_create(lead=lead)
+        product: Product = cleaned_data.get("product")
+        contract = create_contract(
+            product=product,
+            customer=customer,
+            start_date=cleaned_data.get("start_date"),
+            end_date=cleaned_data.get("end_date"),
+        )
+        if not contract:
+            return HttpResponse("Failed to create contract", status=400)
+        return HttpResponseRedirect(reverse("customers:customers_list"))
+
+
+class CustomersCreateView(CustomerCreateFromLeadView):
+    """Представление для создания клиента"""
+
     template_name = "customers/customers-create.html"
-    form_class = CustomerCreateForm
-    success_url = reverse_lazy("customers:customers_list")
 
     def get(self, request, *args, **kwargs):
         """Передаем форму для заполнения исходными данными"""
@@ -45,28 +84,18 @@ class CustomersCreateView(PermissionRequiredMixin, generic.CreateView):
         lead: Lead = cleaned_data.get("lead")
         product: Product = form.cleaned_data.get("product")
         customer, _ = Customer.objects.get_or_create(lead=lead)
-        contract: Contract = Contract(
-            name=f"Контракт об оказании услуги '{product.name}'",
-            cost=product.cost,
+        if not customer.is_active:
+            customer.is_active = True
+            customer.save()
+        contract = create_contract(
             product=product,
-            lead=lead,
             customer=customer,
             start_date=cleaned_data.get("start_date"),
             end_date=cleaned_data.get("end_date"),
         )
-        contract.save()
+        if not contract:
+            return HttpResponse("Failed to create contract", status=400)
         return HttpResponseRedirect(reverse("customers:customers_list"))
-
-
-class CustomerCreateFromLeadView(CustomersCreateView):
-    """Представление для создания клиента на основе лида"""
-
-    def get(self, request, *args, pk=None, **kwargs):
-        lead_qs = Lead.objects.filter(id=pk)
-        form = CustomerCreateForm()
-        form.fields["lead"].queryset = lead_qs
-        form.fields["lead"].initial = lead_qs[0]
-        return render(request, self.template_name, {"form": form})
 
 
 class CustomersDetailView(PermissionRequiredMixin, generic.DetailView):
@@ -84,11 +113,43 @@ class CustomersUpdateView(PermissionRequiredMixin, generic.UpdateView):
     model = Customer
     template_name = "customers/customers-edit.html"
     form_class = CustomerUpdateForm
+    context_object_name = "object"
 
     def get_success_url(self):
         return reverse(
             "customers:customer_details",
             kwargs={"pk": self.object.pk},
+        )
+
+    def get_initial(self, *args, **kwargs):
+        initial = super().get_initial()
+        customer = self.object
+        lead = customer.lead
+        initial["last_name"] = lead.last_name
+        initial["first_name"] = lead.first_name
+        initial["phone"] = lead.phone
+        initial["email"] = lead.email
+        return initial
+
+    def post(self, request, *args, pk=None, **kwargs):
+        object: Customer = Customer.objects.get(pk=pk)
+        form = CustomerUpdateForm(request.POST)
+        context = {"form": form, "object": object}
+        if not form.is_valid():
+            return render(request, self.template_name, context, status=400)
+
+        cleaned_data = form.cleaned_data
+        lead: Lead = object.lead
+        lead.last_name = cleaned_data.get("last_name")
+        lead.first_name = cleaned_data.get("first_name")
+        lead.phone = cleaned_data.get("phone")
+        lead.email = cleaned_data.get("email")
+        lead.save()
+        return HttpResponseRedirect(
+            reverse(
+                "customers:customer_details",
+                kwargs={"pk": object.pk},
+            )
         )
 
 

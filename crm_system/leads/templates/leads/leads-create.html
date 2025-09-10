@@ -8,10 +8,8 @@
       <form method="POST" action="{% url "leads:lead_create" %}">
         {% csrf_token %}
         {{ form.as_p }}
-        <div class="d-flex justify-content-between">
-          <button type="submit" class="btn btn-primary">Создать</button>
-          <a href="{% url "leads:leads_list" %}" class="btn btn-info">Назад</a>
-        </div>
+        <button type="submit" class="btn btn-primary">Создать</button>
+        <a href="{% url "leads:leads_list" %}" class="btn btn-secondary">Назад</a>
       </form>
     </div>
     <div class="col"></div>

@@ -6,7 +6,8 @@ from customers.models import Customer
 
 class ContractsInline(admin.TabularInline):
     model = Contract
-    fields = ["name", "cost", "status"]
+    fields = ["name", "cost", "is_active", "status"]
+    show_change_link = True
     extra = 0
 
 

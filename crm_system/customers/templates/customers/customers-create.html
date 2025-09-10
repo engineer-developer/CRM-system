@@ -9,6 +9,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Создать</button>
+        <a href="{% url 'customers:customers_list' %}" class="btn btn-secondary">Назад</a>
       </form>
     </div>
     <div class="col"></div>

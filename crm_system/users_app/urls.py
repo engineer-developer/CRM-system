@@ -10,7 +10,7 @@ from users_app.views import (
 )
 
 
-app_name = "users_app"
+app_name = "users"
 
 urlpatterns = [
     path("new/", UserCreateView.as_view(), name="user_create"),

@@ -1,15 +1,15 @@
 {% extends "_base.html" %}
 
 {% block content %}
-  <h2 class="fw-bold">Редактирование активного клиента</h2>
+  <h2 class="fw-bold">Редактирование рекламной компании</h2>
   <div class="row bg-white px-3 py-3 mx-2 my-5 rounded pb-5 shadow-lg">
     <div class="col"></div>
     <div class="col">
-      <form method="POST" action="{% url 'customers:customer_edit' object.pk %}">
+      <form method="POST" action="{% url "ads:ad_edit" object.pk %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Применить</button>
-        <a href="{% url "customers:customer_details" object.pk %}" class="btn btn-secondary">Назад</a>
+        <a href="{% url "ads:ad_details" object.pk %}" class="btn btn-secondary">Назад</a>
       </form>
     </div>
     <div class="col"></div>

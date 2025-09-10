@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
@@ -30,8 +31,10 @@ urlpatterns = [
     path("leads/", include("leads.urls")),
     path("customers/", include("customers.urls")),
     path("contracts/", include("contracts.urls")),
+    path("ads/", include("advertisements.urls")),
     path("", include("crm_app.urls")),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 if DEBUG:
     urlpatterns += debug_toolbar_urls()

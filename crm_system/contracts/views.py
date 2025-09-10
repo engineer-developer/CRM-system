@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views import generic
@@ -6,6 +8,7 @@ from django.http import HttpResponseRedirect
 
 from contracts.forms import ContractForm
 from contracts.models import Contract
+from contracts.utils import contract_name_factory
 from customers.models import Customer
 from leads.models import Lead
 
@@ -17,7 +20,10 @@ class ContractsListView(PermissionRequiredMixin, generic.ListView):
     model = Contract
     template_name = "contracts/contracts-list.html"
     context_object_name = "contracts"
-    ordering = ["created_at"]
+    ordering = ["-created_at"]
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
 
 
 class ContractsCreateView(PermissionRequiredMixin, generic.CreateView):
@@ -30,20 +36,21 @@ class ContractsCreateView(PermissionRequiredMixin, generic.CreateView):
     success_url = reverse_lazy("contracts:contracts_list")
 
     def post(self, request, *args, **kwargs):
-        form = self.get_form(self.get_form_class())
+        form = ContractForm(request.POST, request.FILES)
         if not form.is_valid():
-            return render(request, self.template_name, {"form": form})
+            return render(request, self.template_name, {"form": form}, status=400)
 
-        contract: Contract = form.save(commit=False)
-
-        product = form.cleaned_data.get("product")
-        contract.name = f"Контракт об оказании услуги '{product.name}'"
-        contract.cost = product.cost
+        contract = form.save(commit=False)
 
         lead: Lead = form.cleaned_data.get("lead")
         customer, _ = Customer.objects.get_or_create(lead=lead)
-        contract.customer = customer
+        if not customer.is_active:
+            customer.is_active = True
+            customer.save()
 
+        contract.customer = customer
+        contract.cost = contract.product.cost
+        contract.name = contract_name_factory(contract)
         contract.save()
         return HttpResponseRedirect(reverse("contracts:contracts_list"))
 
@@ -64,26 +71,44 @@ class ContractsUpdateView(PermissionRequiredMixin, generic.UpdateView):
     template_name = "contracts/contracts-edit.html"
     form_class = ContractForm
 
+    def get_success_url(self):
+        obj = self.object
+        return reverse(
+            "contracts:contract_details",
+            kwargs={"pk": obj.pk},
+        )
+
+    def get_initial(self, *args, **kwargs):
+        """Предзаполняем поля формы"""
+        initial = super().get_initial()
+        contract: Contract = self.object
+
+        initial["lead"] = contract.customer.lead
+        initial["start_date"] = datetime.datetime.strftime(
+            contract.start_date, "%Y-%m-%d"
+        )
+        initial["end_date"] = datetime.datetime.strftime(contract.end_date, "%Y-%m-%d")
+        return initial
+
     def post(self, request, *args, pk=None, **kwargs):
-
-        form = self.get_form(self.get_form_class())
+        """Обновляем сведения о контракте"""
+        contract = Contract.objects.get(pk=pk)
+        form = ContractForm(request.POST, request.FILES, instance=contract)
+        context = {
+            "form": form,
+            "object": contract,
+        }
         if not form.is_valid():
-            return render(request, self.template_name, {"form": form})
+            return render(request, self.template_name, context)
 
-        contract: Contract = Contract.objects.get(pk=pk)
-        cleaned_data = form.cleaned_data
-        for key, value in cleaned_data.items():
-            setattr(contract, key, value)
+        contract = form.save(commit=False)
 
-        product = cleaned_data.get("product")
-        contract.name = f"Контракт об оказании услуги '{product.name}'"
-
-        contract.cost = product.cost
-
-        lead: Lead = cleaned_data.get("lead")
+        lead = form.cleaned_data.get("lead")
         customer, _ = Customer.objects.get_or_create(lead=lead)
         contract.customer = customer
 
+        contract.cost = contract.product.cost
+        contract.name = contract_name_factory(contract)
         contract.save()
         return HttpResponseRedirect(
             reverse(
@@ -107,10 +132,8 @@ class ContractsDeleteView(PermissionRequiredMixin, generic.DeleteView):
         Если у клиента контрактов нет,
         убираем его из активных клиентов (удаляем клиента без контрактов)
         """
-
         contract: Contract = self.object
         customer: Customer = contract.customer
-
         contract.delete()
 
         if not customer.contracts.exists():

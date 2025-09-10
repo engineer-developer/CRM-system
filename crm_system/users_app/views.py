@@ -56,7 +56,7 @@ class UserCreateView(PermissionRequiredMixin, CreateView):
     def get_success_url(self):
         """Получаем ссылку для перехода после успешного создания нового пользователя"""
         return reverse(
-            "users_app:user_details",
+            "users:user_details",
             kwargs={"pk": self.object.pk},
         )
 
@@ -72,9 +72,15 @@ class UserUpdateView(PermissionRequiredMixin, UpdateView):
     def get_success_url(self):
         """Получаем ссылку для перехода после успешного редактирования пользователя"""
         return reverse(
-            "users_app:user_details",
+            "users:user_details",
             kwargs={"pk": self.object.pk},
         )
+
+    def get_initial(self):
+        initial = super().get_initial()
+        obj = self.get_object()
+        initial["groups"] = obj.groups.first()
+        return initial
 
 
 class UserDeleteView(PermissionRequiredMixin, DeleteView):
@@ -83,7 +89,7 @@ class UserDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "auth.delete_user"
     model = User
     template_name = "users_app/users-delete.html"
-    success_url = reverse_lazy("users_app:users_list")
+    success_url = reverse_lazy("users:users_list")
 
 
 class UserPasswordUpdateView(UserPassesTestMixin, View):
@@ -98,8 +104,8 @@ class UserPasswordUpdateView(UserPassesTestMixin, View):
         """
         user = self.request.user
 
-        is_user_in_group = user.groups.filter(name="администратор").exists()
-        if user.is_superuser or is_user_in_group:
+        is_in_admin_group = user.groups.filter(name="администратор").exists()
+        if user.is_superuser or is_in_admin_group:
             return True
         return False
 
@@ -127,7 +133,7 @@ class UserPasswordUpdateView(UserPassesTestMixin, View):
         user.save()
         return HttpResponseRedirect(
             reverse(
-                "users_app:user_details",
+                "users:user_details",
                 kwargs={"pk": user.pk},
             )
         )

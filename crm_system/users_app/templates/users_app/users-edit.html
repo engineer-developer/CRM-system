@@ -6,13 +6,13 @@
     <div class="col"></div>
     <div class="col">
       <div class="flex-container">
-        <form method="POST" action={% url "users_app:user_edit" object.pk %}>
+        <form method="POST" action={% url "users:user_edit" object.pk %}>
           {% csrf_token %}
           {{ form.as_p }}
-          <div style="display:flex; justify-content: center ; flex-wrap: wrap; gap: 5px;">
-            <button type="submit" class="btn btn-primary">Применить</button>
-            <a href="{% url "users_app:user_change_pass" object.pk %}" class="btn btn-info ">Изменить пароль</a>
-            <a href="{% url "users_app:user_details" object.pk %}" class="btn btn-secondary">Назад</a>
+          <div class="d-flex justify-content-between align-items-stretch">
+            <button type="submit" class="btn btn-primary">OK</button>
+            <a href="{% url "users:user_change_pass" object.pk %}" class="btn btn-info">Сменить пароль</a>
+            <a href="{% url "users:user_details" object.pk %}" class="btn btn-secondary align-content-center">Назад</a>
           </div>
         </form>
       </div>

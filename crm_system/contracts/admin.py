@@ -24,8 +24,9 @@ class ContractAdmin(admin.ModelAdmin):
         "name",
         "cost",
         "customer",
-        "created_at",
+        "is_active",
     )
     list_display_links = ("name",)
+    list_filter = ("product", "is_active")
     search_fields = ("name",)
     actions = [delete_contract_with_non_client]

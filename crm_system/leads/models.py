@@ -42,6 +42,15 @@ class Lead(models.Model):
         verbose_name="Email",
     )
     is_active = models.BooleanField(default=True, null=False, verbose_name="Активен")
+    ad = models.ForeignKey(
+        "advertisements.Advertisement",
+        on_delete=models.SET_DEFAULT,
+        default=None,
+        null=True,
+        related_name="leads",
+        verbose_name="Рекламная кампания",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
