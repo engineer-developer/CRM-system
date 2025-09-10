@@ -215,3 +215,4 @@ BRIEF/
 # Project static
 crm_system/static
 example_templates
+uploads/
