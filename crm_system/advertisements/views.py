@@ -89,10 +89,10 @@ class AdsStatisticListView(PermissionRequiredMixin, generic.ListView):
     ordering = ["-product__cost"]
 
     def get_queryset(self):
-        Contract = apps.get_model("contracts", "Contract")
+        contract_model = apps.get_model("contracts", "Contract")
 
         total_contracts_cost_subquery = (
-            Contract.objects.filter(
+            contract_model.objects.filter(
                 product__advertisements=OuterRef("pk"), is_active=True
             )
             .values("product__advertisements")

@@ -5,6 +5,8 @@ from customers.models import Customer
 
 
 class ContractsInline(admin.TabularInline):
+    """Инлайн модели контракта"""
+
     model = Contract
     fields = ["name", "cost", "is_active", "status"]
     show_change_link = True
@@ -20,7 +22,8 @@ class CustomerAdmin(admin.ModelAdmin):
     list_display_links = ("id", "fullname")
     inlines = (ContractsInline,)
 
-    def fullname(self, obj):
+    def fullname(self, obj) -> str:
+        """Получаем полное имя клиента"""
         return f"{obj.lead.last_name} {obj.lead.first_name}"
 
     fullname.short_description = "Полное имя"

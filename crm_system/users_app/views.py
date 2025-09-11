@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -15,6 +15,8 @@ from django.views.generic import (
 )
 
 from users_app.forms import UserCreateForm, UserUpdateForm, UserPasswordForm
+
+User = get_user_model()
 
 
 class UsersListView(PermissionRequiredMixin, ListView):
@@ -109,7 +111,7 @@ class UserPasswordUpdateView(UserPassesTestMixin, View):
             return True
         return False
 
-    def get(self, request, *args, pk=None, **kwargs):
+    def get(self, request, pk=None):
         """Рендеринг формы изменения пароля пользователя"""
         user = get_object_or_404(User, pk=pk)
         form = UserPasswordForm()
@@ -119,7 +121,7 @@ class UserPasswordUpdateView(UserPassesTestMixin, View):
         }
         return render(request, self.template_name, context)
 
-    def post(self, request, *args, pk=None, **kwargs):
+    def post(self, request, pk=None):
         """Обработка данных переданных в форму изменения пароля пользователя"""
         user = User.objects.get(pk=pk)
         form = UserPasswordForm(request.POST)

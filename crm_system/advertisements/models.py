@@ -38,5 +38,5 @@ class Advertisement(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

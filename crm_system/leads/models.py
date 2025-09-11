@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 
 
 def validate_phone(value: str):
+    """Проверка правильность указания формата номера телефона"""
     if not value.startswith(("+7", "8")):
         raise ValidationError("Phone number must be entered in the format: +7 or 8")
     if not value[1:].isdigit():
@@ -59,8 +60,10 @@ class Lead(models.Model):
         self.is_active = False
         self.save()
 
-    def fullname(self):
+    def fullname(self) -> str:
+        """Получаем полное имя лида"""
         return f"{self.last_name} {self.first_name}"
 
     def __str__(self):
+        """Строковое представление объекта"""
         return f"Лид '{self.fullname()}'"

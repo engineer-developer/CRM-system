@@ -21,7 +21,8 @@ class Customer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата изменения")
 
-    def fullname(self):
+    def fullname(self) -> str:
+        """Получаем полное имя клиента"""
         return f"{self.lead.last_name} {self.lead.first_name}"
 
     def delete(self, using=None, keep_parents=False):

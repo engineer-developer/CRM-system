@@ -1,5 +1,7 @@
 from datetime import date
 
+from django.db import DatabaseError
+
 from contracts.models import Contract
 from customers.models import Customer
 from products.models import Product
@@ -11,6 +13,7 @@ def create_contract(
     start_date: date,
     end_date: date,
 ):
+    """Создаем объект контракта"""
     try:
         contract = Contract(
             cost=product.cost,
@@ -22,13 +25,15 @@ def create_contract(
         contract.name = contract_name_factory(contract)
         contract.save()
         return contract
-    except Exception:
+    except DatabaseError:
         return None
 
 
 def contract_name_factory(contract: Contract):
-    contract_name = "Контракт c '{}' об оказании услуги '{}'".format(
-        contract.customer.fullname(),
-        contract.product.name,
+    """Создаем наименование контракта"""
+    customer_fullname = contract.customer.fullname()
+    product_name = contract.product.name
+    contract_name = (
+        f"Контракт c '{customer_fullname}' об оказании услуги '{product_name}'"
     )
     return contract_name

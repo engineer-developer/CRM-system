@@ -1,5 +1,4 @@
 from django import forms
-from django.core.validators import FileExtensionValidator
 
 from contracts.models import Contract
 from leads.models import Lead
@@ -38,4 +37,5 @@ class ContractForm(forms.ModelForm):
 
     @property
     def field_order(self):
+        """Задаем порядок отображения полей"""
         return ["lead", "product", "start_date", "end_date", "file"]

@@ -65,7 +65,7 @@ class CustomerUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Customer
-        exclude = ("lead", "is_active")
+        fields = ()
 
     last_name = forms.CharField(
         label="Фамилия",

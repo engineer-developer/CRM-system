@@ -4,7 +4,6 @@ from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from contracts.models import Contract
 from customers.forms import (
     CustomerCreateForm,
     CustomerUpdateForm,
@@ -131,15 +130,15 @@ class CustomersUpdateView(PermissionRequiredMixin, generic.UpdateView):
         initial["email"] = lead.email
         return initial
 
-    def post(self, request, *args, pk=None, **kwargs):
-        object: Customer = Customer.objects.get(pk=pk)
-        form = CustomerUpdateForm(request.POST)
-        context = {"form": form, "object": object}
+    def post(self, request, *args, **kwargs):
+        customer: Customer = self.object
+        form = CustomerUpdateForm(request.POST, instance=customer)
+        context = {"form": form, "object": customer}
         if not form.is_valid():
             return render(request, self.template_name, context, status=400)
 
         cleaned_data = form.cleaned_data
-        lead: Lead = object.lead
+        lead: Lead = customer.lead
         lead.last_name = cleaned_data.get("last_name")
         lead.first_name = cleaned_data.get("first_name")
         lead.phone = cleaned_data.get("phone")
@@ -148,7 +147,7 @@ class CustomersUpdateView(PermissionRequiredMixin, generic.UpdateView):
         return HttpResponseRedirect(
             reverse(
                 "customers:customer_details",
-                kwargs={"pk": object.pk},
+                kwargs={"pk": customer.pk},
             )
         )
 

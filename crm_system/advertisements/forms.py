@@ -4,6 +4,7 @@ from advertisements.models import Advertisement
 
 
 class AdvertisementForm(forms.ModelForm):
+    """Форма для модели рекламной кампании"""
 
     class Meta:
         model = Advertisement
