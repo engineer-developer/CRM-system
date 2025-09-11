@@ -12,25 +12,35 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
-from decouple import config
+from decouple import Config, RepositoryEnv
 from django.urls.base import reverse_lazy
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).parent.parent.resolve().absolute()
+
+ENV_FILE_PATH = BASE_DIR.parent / ".env"
+config = Config(RepositoryEnv(ENV_FILE_PATH))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-5uv432s)0)e2kqx-5@n^n*!p9rw1*86vzs8f+bj1k_er!1x)=2"
+SECRET_KEY = config(
+    "DJANGO_SECRET_KEY",
+    default="django-insecure-5uv432s)0)e2kqx-5@n^n*!p9rw1*86vzs8f+bj1k_er!1x)=2",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DJANGO_DEBUG", default=0, cast=int) == 1
+print(f"DEBUG_MODE: {DEBUG}")
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-INTERNAL_IPS = ["127.0.0.1", "localhost"]
+
+if DEBUG:
+    INTERNAL_IPS = ["127.0.0.1", "localhost"]
+
 
 # Application definition
 
