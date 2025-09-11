@@ -33,8 +33,10 @@ urlpatterns = [
     path("contracts/", include("contracts.urls")),
     path("ads/", include("advertisements.urls")),
     path("", include("crm_app.urls")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
 
 
 if DEBUG:
     urlpatterns += debug_toolbar_urls()
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
