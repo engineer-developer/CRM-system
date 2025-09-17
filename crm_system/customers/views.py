@@ -4,6 +4,7 @@ from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
+from contracts.models import Contract
 from customers.forms import (
     CustomerCreateForm,
     CustomerUpdateForm,
@@ -138,6 +139,15 @@ class CustomersUpdateView(PermissionRequiredMixin, generic.UpdateView):
         initial["phone"] = lead.phone
         initial["email"] = lead.email
         return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        contracts = Contract.objects.filter(
+            customer=self.object,
+            is_active=True,
+        )
+        context["contracts"] = contracts
+        return context
 
     def post(self, request, *args, **kwargs):
         customer: Customer = self.object
