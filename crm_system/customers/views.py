@@ -104,6 +104,15 @@ class CustomersDetailView(PermissionRequiredMixin, generic.DetailView):
     model = Customer
     template_name = "customers/customers-detail.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        products = Product.objects.filter(
+            contracts__customer=self.object,
+            contracts__is_active=True,
+        )
+        context["products"] = products
+        return context
+
 
 class CustomersUpdateView(PermissionRequiredMixin, generic.UpdateView):
     """Представление для обновления информации о клиенте"""
