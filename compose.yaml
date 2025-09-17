@@ -19,10 +19,11 @@ services:
 
   nginx:
     image: nginx:alpine
+    restart: always
     ports:
       - "127.0.0.1:80:80"                   # Доступ по http://localhost
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./crm_system/static:/app/static     # Монтируем статику с хоста
       - ./crm_system/uploads:/app/media     # Монтируем медиа с хоста
     networks:
