@@ -25,11 +25,7 @@ class CustomersListView(PermissionRequiredMixin, generic.ListView):
     context_object_name = "customers"
 
     def get_queryset(self):
-        return (
-            Customer.objects.filter(is_active=True)
-            .select_related("lead")
-            .prefetch_related("contracts__product")
-        )
+        return Customer.objects.filter(is_active=True).select_related("lead")
 
 
 class CustomerCreateFromLeadView(PermissionRequiredMixin, generic.FormView):
@@ -145,7 +141,7 @@ class CustomersUpdateView(PermissionRequiredMixin, generic.UpdateView):
         contracts = Contract.objects.filter(
             customer=self.object,
             is_active=True,
-        )
+        ).prefetch_related("product")
         context["contracts"] = contracts
         return context
 
