@@ -178,3 +178,17 @@ class CustomersDeleteView(PermissionRequiredMixin, generic.DeleteView):
     model = Customer
     template_name = "customers/customers-delete.html"
     success_url = reverse_lazy("customers:customers_list")
+
+
+class CustomersContractDeleteView(PermissionRequiredMixin, generic.DeleteView):
+    """Представление для удаления контракта клиента"""
+
+    permission_required = ["customers.delete_customer"]
+    model = Contract
+    template_name = "customers/customers-contract-delete.html"
+
+    def get_success_url(self):
+        return reverse(
+            "customers:customer_details",
+            kwargs={"pk": self.object.customer.pk},
+        )
