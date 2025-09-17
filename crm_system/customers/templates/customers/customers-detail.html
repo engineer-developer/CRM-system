@@ -1,0 +1,36 @@
+{% extends "_base.html" %}
+
+{% block content %}
+  <h2 class="fw-bold">Детальная информация об активном клиенте</h2>
+  <div class="row bg-white px-3 py-3 mx-2 my-5 rounded pb-5 shadow-lg">
+    <div class="col"></div>
+    <div class="col">
+      <div class="card border-dark shadow" style="background: #eee">
+        <div class="card-body">
+          <h5 class="card-title fw-bold">{{ object.lead.last_name }} {{ object.lead.first_name }}</h5>
+          <p class="card-text">{{ object.lead.phone }}</p>
+          <div class="d-flex justify-content-end fw-bold mb-2">{{ object.lead.email }}</div>
+
+          {% if products %}
+            <ol>
+              <div class="fw-bold">Оказываемые услуги:</div>
+              {% for product in products %}
+                <li class="fst-italic">{{ product.name }}</li>
+              {% endfor %}
+            </ol>
+
+          {% else %}
+            <div>Услуги пока не оказываются</div>
+          {% endif %}
+
+          <div class="d-flex justify-content-between fw-bold">
+            <a href="{% url 'customers:customer_edit' object.pk %}" class="btn btn-primary">Редактировать</a>
+            <a href="{% url 'customers:customer_delete' object.pk %}" class="btn btn-danger">Удалить</a>
+            <a href="{% url "customers:customers_list" %}" class="btn btn-secondary">Назад</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col"></div>
+  </div>
+{% endblock %}

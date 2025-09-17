@@ -1,0 +1,33 @@
+{% extends "_base.html" %}
+
+{% block content %}
+  <h2 class="fw-bold">Редактирование активного клиента</h2>
+  <div class="row bg-white px-3 py-3 mx-2 my-5 rounded pb-5 shadow-lg">
+    <div class="col"></div>
+    <div class="col">
+      <form method="POST" action="{% url 'customers:customer_edit' object.pk %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        {% if contracts %}
+          <ol>
+            <div class="fw-bold mb-3">Контракты на оказание услуг:</div>
+            {% for contract in contracts %}
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <li>{{ contract.product.name }}</li>
+                <a href="{% url "customers:customer_contract_delete" contract.pk %}" class="btn btn-danger">Удалить</a>
+              </div>
+            {% endfor %}
+          </ol>
+
+        {% else %}
+          <div>Пока нет контрактов</div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Применить</button>
+        <a href="{% url "customers:customer_details" object.pk %}" class="btn btn-secondary">Назад</a>
+      </form>
+    </div>
+    <div class="col"></div>
+  </div>
+{% endblock %}
