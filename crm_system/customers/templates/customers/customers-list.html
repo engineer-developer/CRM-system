@@ -11,16 +11,7 @@
         {% for customer in customers %}
           <li class="list-group-item list-group-item-light d-flex justify-content-between">
             <a href="{% url 'customers:customer_details' customer.pk %}" class="text-decoration-none link-dark"
-            >{{ customer.lead.last_name }} {{ customer.lead.first_name }}
-              (Услуги:
-              {% for contract in customer.contracts.all %}
-                {% if contract.is_active %}
-                  {{ contract.product.name }}
-                  {% if not forloop.last %} | {% endif %}
-                {% endif %}
-              {% endfor %}
-              )
-            </a>
+            >{{ customer.lead.last_name }} {{ customer.lead.first_name }}</a>
             <a href="{% url 'customers:customer_delete' customer.pk %}" class="btn btn-danger"
             >Удалить</a>
           </li>
