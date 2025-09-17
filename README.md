@@ -92,5 +92,4 @@ cd crm_system/
 gunicorn --access-logfile - -b 0.0.0.0:8000 crm_core.wsgi
 ```
 
-## Приложение доступно по нижеуказанному URL
-[>>> URL приложения](http://localhost)
+## Приложение доступно по URL http://localhost
